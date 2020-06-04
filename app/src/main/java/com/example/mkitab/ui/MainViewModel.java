@@ -1,23 +1,29 @@
 package com.example.mkitab.ui;
 
-import android.util.MutableFloat;
-
-import androidx.databinding.Observable;
 import androidx.databinding.ObservableField;
-import androidx.lifecycle.LiveData;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
-public class MainViewModel {
+public class MainViewModel extends ViewModel {
 
     private ObservableField<String> bookName;
-    LiveData<String> mBookName;
-//    private String bookName;
-
+    private MutableLiveData<String> mBookName;
 
     public MainViewModel() {
-        bookName = new ObservableField<>("1111");
-//        bookName = "1111";
+        bookName = new ObservableField<>();
+        mBookName = new MutableLiveData<>();
+        mBookName.setValue("11111");
+     }
+
+    public void addLifecycleToBookName(LifecycleOwner lifecycleOwner) {
+        mBookName.observe(lifecycleOwner, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                bookName.set(s);
+            }
+        });
     }
 
     public ObservableField<String> getBookName() {
@@ -28,12 +34,11 @@ public class MainViewModel {
         this.bookName = bookName;
     }
 
+    public MutableLiveData<String> getmBookName() {
+        return mBookName;
+    }
 
-//    public String getBookName() {
-//        return bookName;
-//    }
-//
-//    public void setBookName(String bookName) {
-//        this.bookName = bookName;
-//    }
+    public void setmBookName(MutableLiveData<String> mBookName) {
+        this.mBookName = mBookName;
+    }
 }
