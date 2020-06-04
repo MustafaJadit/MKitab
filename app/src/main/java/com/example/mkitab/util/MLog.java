@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.example.mkitab.BuildConfig;
 
-public class MLog<T> {
+public class MLog {
     private static final String TAG = "MLog";
     public static final boolean isDebug = BuildConfig.DEBUG;
 
