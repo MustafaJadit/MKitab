@@ -1,11 +1,8 @@
 package com.example.mkitab.viewmodel;
 
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModel;
 
 import com.example.mkitab.MApplication;
-import com.example.mkitab.databinding.ActivityMainBinding;
-import com.example.mkitab.databinding.ActivityMainBindingImpl;
 import com.example.mkitab.model.Networking;
 import com.example.mkitab.model.entity.AllBooks;
 import com.example.mkitab.ui.AllBooksRecyclerAdapter;
