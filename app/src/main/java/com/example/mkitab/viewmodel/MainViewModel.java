@@ -1,12 +1,16 @@
 package com.example.mkitab.viewmodel;
 
-import androidx.databinding.ObservableField;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
+import com.example.mkitab.MApplication;
+import com.example.mkitab.databinding.ActivityMainBinding;
+import com.example.mkitab.databinding.ActivityMainBindingImpl;
+import com.example.mkitab.model.Networking;
+import com.example.mkitab.model.entity.AllBooks;
+import com.example.mkitab.ui.AllBooksRecyclerAdapter;
 import com.example.mkitab.util.MLog;
+import com.google.gson.stream.JsonReader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,49 +19,29 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainViewModel extends ViewModel {
 
-    private ObservableField<String> bookName;
-    private MutableLiveData<String> mBookName;
+    private AllBooksRecyclerAdapter adapter;
 
-    public MainViewModel() {
-        bookName = new ObservableField<>();
-        mBookName = new MutableLiveData<>();
-        mBookName.setValue("11111");
+    public void setAdapter(AllBooksRecyclerAdapter adapter) {
+        this.adapter = adapter;
     }
 
-    public void addLifecycleToBookName(LifecycleOwner lifecycleOwner) {
-        mBookName.observe(lifecycleOwner, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                bookName.set(s);
-            }
-        });
-    }
 
-    public ObservableField<String> getBookName() {
-        return bookName;
-    }
-
-    public void setBookName(ObservableField<String> bookName) {
-        this.bookName = bookName;
-    }
-
-    public MutableLiveData<String> getmBookName() {
-        return mBookName;
-    }
-
-    public void setmBookName(MutableLiveData<String> mBookName) {
-        this.mBookName = mBookName;
-    }
-
+    // fetch data using old native way
     public void fetchData() {
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String s = "https://www.google.com";
+                String s = "http://172.104.143.75:8000/awazliq_kitab/mainlist/";
                 try {
                     URL url = new URL(s);
                     URLConnection urlConnection = url.openConnection();
@@ -78,27 +62,47 @@ public class MainViewModel extends ViewModel {
 
 
                     //if we knew the returned type, we can concert it to a specific data type
-//                    Object content = urlConnection.getContent();
-//                    long date = urlConnection.getDate();
-//                    MLog.log(content.toString());
-//                    MLog.log(date + "");
-//                    String contentType = urlConnection.getContentType();
-//                    MLog.log(contentType);
-//                    String contentEncoding = urlConnection.getContentEncoding();
-//                    MLog.log("contentEncoding " + contentEncoding);
-//                    Map<String, List<String>> headerFields = urlConnection.getHeaderFields();
-//                    MLog.log(headerFields.toString());
+                    // (usually return InputStream)
+                    // so getInputStream and getContent are the same
+                    InputStream content = (InputStream) urlConnection.getContent();
+                    JsonReader jsonReader = new JsonReader(new InputStreamReader(content));
+                    MLog.log(content.toString());
+                    String contentType = urlConnection.getContentType();
+                    MLog.log(contentType);
+                    String contentEncoding = urlConnection.getContentEncoding();
+                    MLog.log("contentEncoding " + contentEncoding);
+                    Map<String, List<String>> headerFields = urlConnection.getHeaderFields();
+                    MLog.log(headerFields.toString());
 
 
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+
                 }
             }
         }).start();
 
 
+    }
+
+
+    public void loadData() {
+        Networking instance = MApplication.getNetworking();
+        instance.getAllBooks(new Callback<AllBooks>() {
+            @Override
+            public void onResponse(Call<AllBooks> call, Response<AllBooks> response) {
+                AllBooks body = response.body();
+                adapter.update(body);
+            }
+
+            @Override
+            public void onFailure(Call<AllBooks> call, Throwable t) {
+
+            }
+        });
     }
 
 }

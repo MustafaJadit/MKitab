@@ -1,24 +1,16 @@
 package com.example.mkitab.ui;
 
 import android.os.Bundle;
-import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.mkitab.R;
 import com.example.mkitab.databinding.ActivityMainBinding;
-import com.example.mkitab.util.MLog;
 import com.example.mkitab.viewmodel.MainViewModel;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,10 +20,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init();
-        viewModel.fetchData();
-        MLog.log("this is mainActivity", getClass());
+        viewModel.loadData();
 
-        test();
     }
 
 
@@ -39,19 +29,13 @@ public class MainActivity extends AppCompatActivity {
         ActivityMainBinding viewDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
         viewModel = viewModelProvider.get(MainViewModel.class);
-        viewModel.addLifecycleToBookName(this);
-        viewDataBinding.setVariable1(viewModel);
+        AllBooksRecyclerAdapter allBooksRecyclerAdapter = new AllBooksRecyclerAdapter(this);
+        viewModel.setAdapter(allBooksRecyclerAdapter);
+        viewDataBinding.allbooks.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        viewDataBinding.allbooks.setLayoutManager(new LinearLayoutManager(this));
+        viewDataBinding.allbooks.setAdapter(allBooksRecyclerAdapter);
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                viewModel.getmBookName().setValue("2222222");
-            }
-        }, 1000);
-    }
-
-    private void test() {
 
     }
+
 }
