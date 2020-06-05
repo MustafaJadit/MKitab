@@ -7,7 +7,7 @@
 
         <variable
             name="variable1"
-            type="com.example.mkitab.ui.MainViewModel" />
+            type="com.example.mkitab.viewmodel.MainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

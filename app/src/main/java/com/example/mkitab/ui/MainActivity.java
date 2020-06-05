@@ -1,21 +1,24 @@
 package com.example.mkitab.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.mkitab.R;
 import com.example.mkitab.databinding.ActivityMainBinding;
 import com.example.mkitab.util.MLog;
+import com.example.mkitab.viewmodel.MainViewModel;
 
-import java.net.HttpURLConnection;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,7 +27,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        viewModel = new MainViewModel(this);
+        init();
+        viewModel.fetchData();
+        MLog.log("this is mainActivity", getClass());
+
+        test();
+    }
+
+
+    private void init() {
         ActivityMainBinding viewDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
         viewModel = viewModelProvider.get(MainViewModel.class);
@@ -35,22 +46,9 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                finish();
                 viewModel.getmBookName().setValue("2222222");
-                try {
-                    Thread.sleep(1000);
-                    Intent intent = new Intent(MainActivity.this, SecondActivity.class);
-                    startActivity(intent);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
             }
         }, 1000);
-
-        MLog.log("this is mainActivity", getClass());
-
-        test();
     }
 
     private void test() {
