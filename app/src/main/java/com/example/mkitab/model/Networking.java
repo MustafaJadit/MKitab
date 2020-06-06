@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,5 +42,9 @@ public class Networking {
 
     public void getVolumes(String id, Callback<List<Volumes>> volumesCallback) {
         mRepositories.getVolumes(id).enqueue(volumesCallback);
+    }
+
+    public void getMP3(String url, Callback<ResponseBody> responseBodyCallback) {
+        mRepositories.getMP3(url).enqueue(responseBodyCallback);
     }
 }

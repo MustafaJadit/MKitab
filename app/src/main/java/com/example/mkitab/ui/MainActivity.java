@@ -1,7 +1,9 @@
 package com.example.mkitab.ui;
 
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -12,15 +14,31 @@ import com.example.mkitab.R;
 import com.example.mkitab.databinding.ActivityMainBinding;
 import com.example.mkitab.viewmodel.MainViewModel;
 
+import java.io.File;
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity {
 
     MainViewModel viewModel;
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init();
         viewModel.loadData();
+
+        test();
+    }
+
+    private void test() {
+        System.out.println(getPackageName());
+        System.out.println(getPackageCodePath());
+        System.out.println(getPackageResourcePath());
+
+        System.out.println(getApplicationInfo().dataDir);
+        System.out.println(getFilesDir().getAbsolutePath());
+
 
     }
 
