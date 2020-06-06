@@ -1,7 +1,6 @@
 package com.example.mkitab.ui;
 
 import android.content.Context;
-import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +13,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mkitab.MApplication;
 import com.example.mkitab.model.Networking;
 import com.example.mkitab.model.entity.Volumes;
+import com.example.mkitab.util.Keys;
 import com.example.mkitab.util.MLog;
 import com.example.mkitab.viewmodel.VolumesModel;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +28,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.Key;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -65,9 +68,12 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
         final File[] file = {new File(context.getApplicationInfo().dataDir + "/" + result.get(position).getId() + "/" + fileName)};
         holder.icon.setImageResource(file[0].exists() ? android.R.drawable.checkbox_on_background : android.R.drawable.checkbox_off_background);
         holder.itemView.setOnClickListener((view) -> {
+
+            EventBus.getDefault().post(Keys.displayAudioController);
+
             Networking networking = MApplication.getNetworking();
             if (file[0].exists() && file[0].isFile()) {
-                startMediaPlayer(file[0]);
+                viewModel.resume(file[0], result.get(position).getId() + "");
                 return;
             }
             networking.getMP3(path, new Callback<ResponseBody>() {
@@ -83,7 +89,7 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
                         Files.asByteSink(file1, FileWriteMode.APPEND).write(bytes);
                         MLog.log(TAG + " completed");
                         holder.icon.setImageResource(android.R.drawable.checkbox_on_background);
-                        startMediaPlayer(file1);
+                        viewModel.resume(file1, result.get(position).getId() + "");
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -102,10 +108,6 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
         });
     }
 
-    private void startMediaPlayer(File file) {
-        viewModel.resume(file);
-
-    }
 
     private void nativeDownload(String path) {
         final FileOutputStream[] fileOutputStream = {null};

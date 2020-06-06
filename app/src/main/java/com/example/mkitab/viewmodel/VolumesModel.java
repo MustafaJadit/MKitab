@@ -1,6 +1,7 @@
 package com.example.mkitab.viewmodel;
 
 import android.media.MediaPlayer;
+import android.os.Bundle;
 
 import androidx.lifecycle.ViewModel;
 
@@ -8,6 +9,9 @@ import com.example.mkitab.MApplication;
 import com.example.mkitab.model.Networking;
 import com.example.mkitab.model.entity.Volumes;
 import com.example.mkitab.ui.VolumesRecyclerAdapter;
+import com.example.mkitab.util.Keys;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,9 +27,11 @@ public class VolumesModel extends ViewModel {
     private String id;
 
     MediaPlayer mediaPlayer = new MediaPlayer();
-    private boolean firstLoaded;
+    private boolean haveLoaded;
     private File file;
     private int currentPosition;
+    private String currentAudioToken = "-1";
+    private String token;
 
 
     public void setAdapter(VolumesRecyclerAdapter adapter, String id) {
@@ -58,23 +64,53 @@ public class VolumesModel extends ViewModel {
 
     }
 
-    public void resume(File file) {
-        this.file = file;
+    public void resume() {
+        resume(file, token);
+    }
 
+    public void resume(File file, String token) {
+        this.file = file;
+        this.token = token;
         try {
             if (mediaPlayer.isPlaying()) {
-                pause();
-                return;
+                if (currentAudioToken.equals(token)) {
+                    mediaPlayer.pause();
+                    currentPosition = mediaPlayer.getCurrentPosition();
+                    EventBus.getDefault().post(Keys.displayPlayIcon);
+                    return;
+                } else {
+                    mediaPlayer.reset();
+                    haveLoaded = false;
+                }
             }
-
-            if (!firstLoaded) {
+            // launch different audio
+            if (!haveLoaded || !currentAudioToken.equals(token)) {
+                mediaPlayer.reset();
                 mediaPlayer.setDataSource(file.getPath());
                 mediaPlayer.prepare();
-            } else {
+                haveLoaded = true;
+                currentAudioToken = token;
+
+                //update duration on UI
+                Bundle bundle = new Bundle();
+                bundle.putInt("audioDuration", mediaPlayer.getDuration());
+                EventBus.getDefault().post(bundle);
+            } else { //launch same audio again
                 mediaPlayer.seekTo(currentPosition);
             }
+            EventBus.getDefault().post(Keys.displayPauseIcon);
+
 
             mediaPlayer.start();
+
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    EventBus.getDefault().post(Keys.displayPlayIcon);
+                    mediaPlayer.release();
+                }
+            });
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -82,14 +118,13 @@ public class VolumesModel extends ViewModel {
     }
 
 
-    public void pause() {
-        mediaPlayer.pause();
-
-        currentPosition = mediaPlayer.getCurrentPosition();
-        firstLoaded = true;
+    public void updateAudioProgress(int progress) {
+        mediaPlayer.seekTo(progress);
+        mediaPlayer.start();
+        EventBus.getDefault().post(Keys.displayPauseIcon);
     }
 
-    public File getFile() {
-        return file;
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
     }
 }

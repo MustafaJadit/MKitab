@@ -21,11 +21,13 @@
             android:layout_height="match_parent" />
 
         <LinearLayout
+            android:id="@+id/media_controller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorAccent"
+            android:background="@color/beige"
             android:orientation="vertical"
             android:padding="15dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <LinearLayout
@@ -38,34 +40,32 @@
                     android:id="@+id/left"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
                     android:onClick="@{()-> var2.previous()}"
-                    android:src="@android:drawable/alert_dark_frame" />
+                    android:src="@drawable/ic_back" />
 
                 <ImageButton
-                    android:id="@+id/center"
+                    android:id="@+id/play_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
-                    android:onClick="@{()->var2.resume(var2.file)}"
-                    android:src="@android:drawable/alert_dark_frame" />
+                    android:background="@android:color/transparent"
+                    android:paddingLeft="2dp"
+                    android:src="@drawable/play_btn" />
 
                 <ImageButton
                     android:id="@+id/right"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:onClick="@{()-> var2.next()}"
-                    android:src="@android:drawable/alert_dark_frame" />
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_next" />
             </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
-                android:max="40"
-                android:min="5"
-                android:progress="15"
-                android:progressDrawable="@color/colorPrimary" />
+                android:progressDrawable="@color/white" />
 
         </LinearLayout>
 
