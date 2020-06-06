@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.mkitab.R;
 import com.example.mkitab.databinding.ActivityVolumesBinding;
 import com.example.mkitab.util.Keys;
+import com.example.mkitab.util.NumToTime;
 import com.example.mkitab.viewmodel.VolumesModel;
 
 import org.greenrobot.eventbus.EventBus;
@@ -35,8 +36,10 @@ public class VolumesActivity extends AppCompatActivity {
 
     private void onclickListener(ActivityVolumesBinding viewDataBinding) {
         viewDataBinding.playBtn.setOnClickListener((v) -> {
-            v.setSelected(!v.isSelected());
             volumesModel.resume();
+            if (volumesModel.getFile() != null) {
+                v.setSelected(!v.isSelected());
+            }
         });
 
 
@@ -80,7 +83,7 @@ public class VolumesActivity extends AppCompatActivity {
             viewDataBinding.seekbar.setProgress(0);
         } else if ((result = bundle.getInt(Keys.audioProgress)) != 0) {
             viewDataBinding.seekbar.setProgress(result);
-            viewDataBinding.audioTime.setText(result + "");
+            viewDataBinding.audioTime.setText(NumToTime.getTimeFromNum(result));
         }
     }
 
@@ -105,7 +108,7 @@ public class VolumesActivity extends AppCompatActivity {
                 if (fromUser && volumesModel.getMediaPlayer() != null) {
                     //update the progress of audio
                     volumesModel.updateAudioProgress(progress);
-                    viewDataBinding.audioTime.setText(progress + "");
+                    viewDataBinding.audioTime.setText(NumToTime.getTimeFromNum(progress));
                 }
             }
 

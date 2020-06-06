@@ -35,6 +35,10 @@ public class VolumesModel extends ViewModel {
     private boolean stopTimer;
 
 
+    public File getFile() {
+        return file;
+    }
+
     public void setAdapter(VolumesRecyclerAdapter adapter, String id) {
         this.adapter = adapter;
         this.id = id;
@@ -70,6 +74,7 @@ public class VolumesModel extends ViewModel {
     }
 
     public void resume(File file, String token) {
+        if (file == null) return;
         this.file = file;
         this.token = token;
         try {
@@ -109,7 +114,6 @@ public class VolumesModel extends ViewModel {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     EventBus.getDefault().post(Keys.displayPlayIcon);
-                    mediaPlayer.release();
                 }
             });
 

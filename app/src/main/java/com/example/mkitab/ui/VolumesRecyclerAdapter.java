@@ -15,6 +15,7 @@ import com.example.mkitab.model.Networking;
 import com.example.mkitab.model.entity.Volumes;
 import com.example.mkitab.util.Keys;
 import com.example.mkitab.util.MLog;
+import com.example.mkitab.util.PixelUtil;
 import com.example.mkitab.viewmodel.VolumesModel;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
@@ -168,6 +169,8 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
         public MViewHolder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(android.R.id.text1);
+            int i = 10 * PixelUtil.dpToPx(1);
+            textView.setPadding(i, i, i, i);
             icon = itemView.findViewById(android.R.id.icon);
         }
     }
