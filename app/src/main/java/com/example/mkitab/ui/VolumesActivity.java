@@ -1,6 +1,8 @@
 package com.example.mkitab.ui;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -30,12 +32,15 @@ public class VolumesActivity extends AppCompatActivity {
         ActivityVolumesBinding viewDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_volumes);
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
         volumesModel = viewModelProvider.get(VolumesModel.class);
-        VolumesRecyclerAdapter volumesRecyclerAdapter = new VolumesRecyclerAdapter(this);
+        VolumesRecyclerAdapter volumesRecyclerAdapter = new VolumesRecyclerAdapter(this, volumesModel);
         volumesModel.setAdapter(volumesRecyclerAdapter, id);
         viewDataBinding.volumes.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         viewDataBinding.volumes.setLayoutManager(new LinearLayoutManager(this));
         viewDataBinding.volumes.setAdapter(volumesRecyclerAdapter);
 
+
         volumesModel.loadData();
     }
+
+
 }

@@ -1,35 +1,28 @@
 package com.example.mkitab.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.media.MediaPlayer;
-import android.os.Build;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mkitab.MApplication;
 import com.example.mkitab.model.Networking;
 import com.example.mkitab.model.entity.Volumes;
 import com.example.mkitab.util.MLog;
-import com.google.common.io.ByteSink;
+import com.example.mkitab.viewmodel.VolumesModel;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -39,15 +32,16 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.http.Url;
 
 public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecyclerAdapter.MViewHolder> {
     private static final String TAG = "VolumesRecyclerAdapter";
     private final Context context;
+    private final VolumesModel viewModel;
     List<Volumes> result;
 
-    public VolumesRecyclerAdapter(Context context) {
+    public VolumesRecyclerAdapter(Context context, VolumesModel viewModel) {
         this.context = context;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -109,15 +103,8 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     }
 
     private void startMediaPlayer(File file) {
-        MediaPlayer mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(file.getPath());
-            System.out.println(file.getCanonicalPath());
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        viewModel.resume(file);
+
     }
 
     private void nativeDownload(String path) {
