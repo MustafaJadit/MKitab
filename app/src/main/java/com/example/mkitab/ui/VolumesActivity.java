@@ -18,8 +18,6 @@ import com.example.mkitab.viewmodel.VolumesModel;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.security.Key;
-
 public class VolumesActivity extends AppCompatActivity {
 
 
@@ -56,9 +54,9 @@ public class VolumesActivity extends AppCompatActivity {
 
         onclickListener(viewDataBinding);
 
-        seekbarListener(viewDataBinding);
 
         volumesModel.loadData();
+        seekbarListener(viewDataBinding);
 
 
     }
@@ -77,9 +75,12 @@ public class VolumesActivity extends AppCompatActivity {
     @Subscribe
     public void onMessage(Bundle bundle) {
         int result = 0;
-        if ((result = bundle.getInt("audioDuration")) != 0) {
+        if ((result = bundle.getInt(Keys.audioDuration)) != 0) {
             viewDataBinding.seekbar.setMax(result);
             viewDataBinding.seekbar.setProgress(0);
+        } else if ((result = bundle.getInt(Keys.audioProgress)) != 0) {
+            viewDataBinding.seekbar.setProgress(result);
+            viewDataBinding.audioTime.setText(result + "");
         }
     }
 
@@ -104,6 +105,7 @@ public class VolumesActivity extends AppCompatActivity {
                 if (fromUser && volumesModel.getMediaPlayer() != null) {
                     //update the progress of audio
                     volumesModel.updateAudioProgress(progress);
+                    viewDataBinding.audioTime.setText(progress + "");
                 }
             }
 
@@ -119,5 +121,9 @@ public class VolumesActivity extends AppCompatActivity {
         });
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        volumesModel.destroyMediaPlayer();
+    }
 }

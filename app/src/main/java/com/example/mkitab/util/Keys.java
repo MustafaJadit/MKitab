@@ -4,4 +4,6 @@ public interface Keys {
     String displayAudioController = "displayAudioController";
     String displayPlayIcon="displayPlayIcon";
     String displayPauseIcon="displayPauseIcon";
+    String audioDuration="audioDuration";
+    String audioProgress="audioProgress";
 }

@@ -32,6 +32,7 @@ public class VolumesModel extends ViewModel {
     private int currentPosition;
     private String currentAudioToken = "-1";
     private String token;
+    private boolean stopTimer;
 
 
     public void setAdapter(VolumesRecyclerAdapter adapter, String id) {
@@ -73,6 +74,7 @@ public class VolumesModel extends ViewModel {
         this.token = token;
         try {
             if (mediaPlayer.isPlaying()) {
+                stopTimer = true;
                 if (currentAudioToken.equals(token)) {
                     mediaPlayer.pause();
                     currentPosition = mediaPlayer.getCurrentPosition();
@@ -111,20 +113,61 @@ public class VolumesModel extends ViewModel {
                 }
             });
 
+            //add timer in separated thread
+            addTimer();
+
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void addTimer() {
+        stopTimer = false;
+        currentPosition = mediaPlayer.getCurrentPosition();
+        int duration = mediaPlayer.getDuration();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                while (mediaPlayer != null && mediaPlayer.isPlaying() && currentPosition < duration) {
+                    try {
+                        if (stopTimer) break;
+                        Thread.sleep(1000);
+
+                        currentPosition = mediaPlayer.getCurrentPosition();
+                    } catch (Exception e) {
+                        return;
+                    }
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(Keys.audioProgress, currentPosition);
+                    EventBus.getDefault().post(bundle);
+
+
+                }
+            }
+        };
+        new Thread(runnable).start();
+
+    }
+
 
     public void updateAudioProgress(int progress) {
-        mediaPlayer.seekTo(progress);
-        mediaPlayer.start();
-        EventBus.getDefault().post(Keys.displayPauseIcon);
+        if (progress >= 0) {
+            mediaPlayer.seekTo(progress);
+            mediaPlayer.start();
+            EventBus.getDefault().post(Keys.displayPauseIcon);
+        }
+
     }
 
     public MediaPlayer getMediaPlayer() {
         return mediaPlayer;
     }
+
+    public void destroyMediaPlayer() {
+        mediaPlayer.stop();
+        mediaPlayer.release();
+        mediaPlayer = null;
+    }
+
 }
