@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
 
@@ -52,7 +53,7 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     @NonNull
     @Override
     public VolumesRecyclerAdapter.MViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View inflate = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_activated_1, parent, false);
+        View inflate = LayoutInflater.from(context).inflate(android.R.layout.activity_list_item, parent, false);
         VolumesRecyclerAdapter.MViewHolder viewHolder = new VolumesRecyclerAdapter.MViewHolder(inflate);
         return viewHolder;
     }
@@ -65,12 +66,13 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     @Override
     public void onBindViewHolder(@NonNull VolumesRecyclerAdapter.MViewHolder holder, int position) {
         holder.textView.setText(result.get(position).getTitle());
+        String path = result.get(position).getPath();
+        String fileName = path.substring(path.lastIndexOf("/") + 1);
+        final File[] file = {new File(context.getApplicationInfo().dataDir + "/" + result.get(position).getId() + "/" + fileName)};
+        holder.icon.setImageResource(file[0].exists() ? android.R.drawable.checkbox_on_background : android.R.drawable.checkbox_off_background);
         holder.itemView.setOnClickListener((view) -> {
-            String path = result.get(position).getPath();
             Networking networking = MApplication.getNetworking();
-            String fileName = path.substring(path.lastIndexOf("/") + 1);
-            final File[] file = {new File(context.getApplicationInfo().dataDir + "/" + result.get(position).getId() + "/" + fileName)};
-            if (file[0].exists()) {
+            if (file[0].exists() && file[0].isFile()) {
                 startMediaPlayer(file[0]);
                 return;
             }
@@ -85,10 +87,8 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
                         File file1 = new File(file[0], fileName);
                         file1.createNewFile();
                         Files.asByteSink(file1, FileWriteMode.APPEND).write(bytes);
-//                        try (FileOutputStream fileOutputStream = context.openFileOutput(file.getName(), Context.MODE_PRIVATE)) {
-//                            fileOutputStream.write(bytes);
-//                        }
                         MLog.log(TAG + " completed");
+                        holder.icon.setImageResource(android.R.drawable.checkbox_on_background);
                         startMediaPlayer(file1);
 
                     } catch (IOException e) {
@@ -111,7 +111,8 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     private void startMediaPlayer(File file) {
         MediaPlayer mediaPlayer = new MediaPlayer();
         try {
-            mediaPlayer.setDataSource(file.getName());
+            mediaPlayer.setDataSource(file.getPath());
+            System.out.println(file.getCanonicalPath());
             mediaPlayer.prepare();
             mediaPlayer.start();
         } catch (IOException e) {
@@ -173,10 +174,12 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     static class MViewHolder extends RecyclerView.ViewHolder {
 
         public final TextView textView;
+        public final ImageView icon;
 
         public MViewHolder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById(android.R.id.text1);
+            icon = itemView.findViewById(android.R.id.icon);
         }
     }
 
