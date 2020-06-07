@@ -4,7 +4,6 @@
     <color name="colorPrimaryDark">@color/peach_puff</color>
     <color name="colorAccent">@color/orange</color>
 
-
     <color name="white">#FFFFFF</color>
     <color name="ivory">#FFFFF0</color>
     <color name="light_yellow">#FFFFE0</color>

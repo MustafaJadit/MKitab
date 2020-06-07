@@ -42,6 +42,13 @@ public class VolumesActivity extends AppCompatActivity {
             }
         });
 
+        viewDataBinding.left.setOnClickListener((v) -> {
+            volumesModel.previous();
+        });
+
+        viewDataBinding.right.setOnClickListener((v) -> {
+            volumesModel.next();
+        });
 
     }
 

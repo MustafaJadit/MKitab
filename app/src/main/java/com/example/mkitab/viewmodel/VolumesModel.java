@@ -33,7 +33,7 @@ public class VolumesModel extends ViewModel {
     private String currentAudioToken = "-1";
     private String token;
     private boolean stopTimer;
-
+    List<Volumes> body;
 
     public File getFile() {
         return file;
@@ -50,7 +50,7 @@ public class VolumesModel extends ViewModel {
         instance.getVolumes(id, new Callback<List<Volumes>>() {
             @Override
             public void onResponse(Call<List<Volumes>> call, Response<List<Volumes>> response) {
-                List<Volumes> body = response.body();
+                body = response.body();
                 adapter.update(body);
             }
 
@@ -62,11 +62,28 @@ public class VolumesModel extends ViewModel {
     }
 
     public void previous() {
-
+        String absolutePath = file.getAbsolutePath();
+        String substring = absolutePath.substring(absolutePath.lastIndexOf("_") + 1, absolutePath.length() - 4);
+        Integer integer = Integer.valueOf(substring);
+        integer -= 1;
+        String path = absolutePath.substring(0, absolutePath.lastIndexOf("_") + 1) + integer + ".mp3";
+        int token_ = Integer.valueOf(token) + 1;
+        String fileName = path.substring(path.lastIndexOf("/") + 1);
+        file = new File(path);
+        adapter.openAudioFile(null, path, fileName, token_);
     }
 
     public void next() {
 
+        String absolutePath = file.getAbsolutePath();
+        String substring = absolutePath.substring(absolutePath.lastIndexOf("_") + 1, absolutePath.length() - 4);
+        Integer integer = Integer.valueOf(substring);
+        integer += 1;
+        String path = absolutePath.substring(0, absolutePath.lastIndexOf("_") + 1) + integer + ".mp3";
+        int token_ = Integer.valueOf(token) - 1;
+        String fileName = path.substring(path.lastIndexOf("/") + 1);
+        file = new File(path);
+        adapter.openAudioFile(null, path, fileName, token_);
     }
 
     public void resume() {

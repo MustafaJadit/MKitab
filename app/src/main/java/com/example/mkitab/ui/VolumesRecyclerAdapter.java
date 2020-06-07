@@ -42,6 +42,7 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     private final Context context;
     private final VolumesModel viewModel;
     List<Volumes> result;
+    File file;
 
     public VolumesRecyclerAdapter(Context context, VolumesModel viewModel) {
         this.context = context;
@@ -66,46 +67,51 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
         holder.textView.setText(result.get(position).getTitle());
         String path = result.get(position).getPath();
         String fileName = path.substring(path.lastIndexOf("/") + 1);
-        final File[] file = {new File(context.getApplicationInfo().dataDir + "/" + result.get(position).getId() + "/" + fileName)};
-        holder.icon.setImageResource(file[0].exists() ? android.R.drawable.checkbox_on_background : android.R.drawable.checkbox_off_background);
+        file = new File(context.getApplicationInfo().dataDir + "/" + result.get(position).getId() + "/" + fileName);
+        holder.icon.setImageResource(file.exists() ? android.R.drawable.checkbox_on_background : android.R.drawable.checkbox_off_background);
         holder.itemView.setOnClickListener((view) -> {
 
             EventBus.getDefault().post(Keys.displayAudioController);
 
-            Networking networking = MApplication.getNetworking();
-            if (file[0].exists() && file[0].isFile()) {
-                viewModel.resume(file[0], result.get(position).getId() + "");
-                return;
-            }
-            networking.getMP3(path, new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                    System.out.println(call.request().url());
-                    try {
-                        byte[] bytes = response.body().bytes();
-                        file[0] = new File(context.getApplicationInfo().dataDir + "/" + result.get(position).getId());
-                        file[0].mkdirs();
-                        File file1 = new File(file[0], fileName);
-                        file1.createNewFile();
-                        Files.asByteSink(file1, FileWriteMode.APPEND).write(bytes);
-                        MLog.log(TAG + " completed");
+            int id = result.get(position).getId();
+            openAudioFile(holder, path, fileName, id);
+
+
+        });
+    }
+
+    public void openAudioFile(@NonNull MViewHolder holder, String path, String fileName, int id) {
+        Networking networking = MApplication.getNetworking();
+        if (file.exists() && file.isFile()) {
+            viewModel.resume(file, id + "");
+            return;
+        }
+        networking.getMP3(path, new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    byte[] bytes = response.body().bytes();
+                    file = new File(context.getApplicationInfo().dataDir + "/" + id);
+                    file.mkdirs();
+                    File file1 = new File(file, fileName);
+                    file1.createNewFile();
+                    Files.asByteSink(file1, FileWriteMode.APPEND).write(bytes);
+                    MLog.log(TAG + " completed");
+                    if (holder != null)
                         holder.icon.setImageResource(android.R.drawable.checkbox_on_background);
-                        viewModel.resume(file1, result.get(position).getId() + "");
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    viewModel.resume(file1, id + "");
 
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
+            }
 
-                }
-            });
-//            nativeDownload(path);
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-
+            }
         });
     }
 
