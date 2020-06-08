@@ -6,4 +6,7 @@ public interface Keys {
     String displayPauseIcon="displayPauseIcon";
     String audioDuration="audioDuration";
     String audioProgress="audioProgress";
+    String audioTitle="audioTitle";
+    int UpdateUI = 12;
+
 }
