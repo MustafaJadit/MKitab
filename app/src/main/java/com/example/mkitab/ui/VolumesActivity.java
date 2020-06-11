@@ -1,6 +1,7 @@
 package com.example.mkitab.ui;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.SeekBar;
 
@@ -22,6 +23,7 @@ import org.greenrobot.eventbus.Subscribe;
 public class VolumesActivity extends AppCompatActivity {
 
 
+    Handler handler=new Handler();
     private VolumesModel volumesModel;
     private String id;
     ActivityVolumesBinding viewDataBinding;
@@ -86,16 +88,19 @@ public class VolumesActivity extends AppCompatActivity {
 
     @Subscribe
     public void onMessage(Bundle bundle) {
-        int result = 0;
-        if ((result = bundle.getInt(Keys.audioDuration)) != 0) {
-            viewDataBinding.seekbar.setMax(result);
-            viewDataBinding.seekbar.setProgress(0);
-            viewDataBinding.title.setText(bundle.getString(Keys.audioTitle));
-            viewDataBinding.duration.setText(NumToTime.getTimeFromNum(result));
-        } else if ((result = bundle.getInt(Keys.audioProgress)) != 0) {
-            viewDataBinding.seekbar.setProgress(result);
-            viewDataBinding.audioTime.setText(NumToTime.getTimeFromNum(result));
-        }
+        final int[] result = {0};
+        handler.post(()->{
+            if ((result[0] = bundle.getInt(Keys.audioDuration)) != 0) {
+                viewDataBinding.seekbar.setMax(result[0]);
+                viewDataBinding.seekbar.setProgress(0);
+                viewDataBinding.title.setText(bundle.getString(Keys.audioTitle));
+                viewDataBinding.duration.setText(NumToTime.getTimeFromNum(result[0]));
+            } else if ((result[0] = bundle.getInt(Keys.audioProgress)) != 0) {
+                viewDataBinding.seekbar.setProgress(result[0]);
+                viewDataBinding.audioTime.setText(NumToTime.getTimeFromNum(result[0]));
+            }
+        });
+
     }
 
 
