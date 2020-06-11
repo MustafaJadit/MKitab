@@ -29,12 +29,13 @@ public class VolumesModel extends ViewModel {
     MediaPlayer mediaPlayer = new MediaPlayer();
     private boolean haveLoaded;
     private File file;
-    private int currentPosition;
+    private int currentPositionOfMediaPlayer;
     private String currentAudioToken = "-1";
     // toven is id
     private String episodeId;
     private boolean stopTimer;
     List<Volumes> list;
+    private String title;
 
     public File getFile() {
         return file;
@@ -71,7 +72,8 @@ public class VolumesModel extends ViewModel {
         int token_ = Integer.valueOf(episodeId) + 1;
         String fileName = path.substring(path.lastIndexOf("/") + 1);
         file = new File(path);
-        adapter.openAudioFile(file, null, path, fileName, token_);
+        //change the method of getting title
+        adapter.openAudioFile(file, null, path, fileName, token_, title);
     }
 
     public void next() {
@@ -84,24 +86,25 @@ public class VolumesModel extends ViewModel {
         int token_ = Integer.valueOf(episodeId) - 1;
         String fileName = path.substring(path.lastIndexOf("/") + 1);
         file = new File(path);
-        adapter.openAudioFile(file, null, path, fileName, token_);
+        adapter.openAudioFile(file, null, path, fileName, token_, title);
     }
 
     public void resume() {
-        resume(file, episodeId);
+        resume(file, episodeId, title);
     }
 
     // delete episodeId field if possible
-    public void resume(File file, String episodeId) {
+    public void resume(File file, String episodeId, String title) {
         if (file == null) return;
         this.file = file;
+        this.title = title;
         this.episodeId = episodeId;
         try {
             if (mediaPlayer.isPlaying()) {
                 stopTimer = true;
                 if (currentAudioToken.equals(episodeId)) {
                     mediaPlayer.pause();
-                    currentPosition = mediaPlayer.getCurrentPosition();
+                    currentPositionOfMediaPlayer = mediaPlayer.getCurrentPosition();
                     EventBus.getDefault().post(Keys.displayPlayIcon);
                     return;
                 } else {
@@ -119,10 +122,11 @@ public class VolumesModel extends ViewModel {
 
                 //update duration on UI
                 Bundle bundle = new Bundle();
-                bundle.putInt("audioDuration", mediaPlayer.getDuration());
+                bundle.putInt(Keys.audioDuration, mediaPlayer.getDuration());
+                bundle.putString(Keys.audioTitle, title);
                 EventBus.getDefault().post(bundle);
             } else { //launch same audio again
-                mediaPlayer.seekTo(currentPosition);
+                mediaPlayer.seekTo(currentPositionOfMediaPlayer);
             }
             EventBus.getDefault().post(Keys.displayPauseIcon);
 
@@ -147,22 +151,22 @@ public class VolumesModel extends ViewModel {
 
     private void addTimer() {
         stopTimer = false;
-        currentPosition = mediaPlayer.getCurrentPosition();
+        currentPositionOfMediaPlayer = mediaPlayer.getCurrentPosition();
         int duration = mediaPlayer.getDuration();
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                while (mediaPlayer != null && mediaPlayer.isPlaying() && currentPosition < duration) {
+                while (mediaPlayer != null && mediaPlayer.isPlaying() && currentPositionOfMediaPlayer < duration) {
                     try {
                         if (stopTimer) break;
-                        Thread.sleep(1000);
+                        Thread.sleep(200);
 
-                        currentPosition = mediaPlayer.getCurrentPosition();
+                        currentPositionOfMediaPlayer = mediaPlayer.getCurrentPosition();
                     } catch (Exception e) {
                         return;
                     }
                     Bundle bundle = new Bundle();
-                    bundle.putInt(Keys.audioProgress, currentPosition);
+                    bundle.putInt(Keys.audioProgress, currentPositionOfMediaPlayer);
                     EventBus.getDefault().post(bundle);
 
 

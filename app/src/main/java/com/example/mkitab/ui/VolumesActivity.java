@@ -37,9 +37,9 @@ public class VolumesActivity extends AppCompatActivity {
     private void onclickListener(ActivityVolumesBinding viewDataBinding) {
         viewDataBinding.playBtn.setOnClickListener((v) -> {
             volumesModel.resume();
-            if (volumesModel.getFile() != null) {
-                v.setSelected(!v.isSelected());
-            }
+//            if (volumesModel.getFile() != null) {
+//                v.setSelected(!v.isSelected());
+//            }
         });
 
         viewDataBinding.left.setOnClickListener((v) -> {
@@ -88,6 +88,8 @@ public class VolumesActivity extends AppCompatActivity {
         if ((result = bundle.getInt(Keys.audioDuration)) != 0) {
             viewDataBinding.seekbar.setMax(result);
             viewDataBinding.seekbar.setProgress(0);
+            viewDataBinding.title.setText(bundle.getString(Keys.audioTitle));
+            viewDataBinding.duration.setText(NumToTime.getTimeFromNum(result));
         } else if ((result = bundle.getInt(Keys.audioProgress)) != 0) {
             viewDataBinding.seekbar.setProgress(result);
             viewDataBinding.audioTime.setText(NumToTime.getTimeFromNum(result));

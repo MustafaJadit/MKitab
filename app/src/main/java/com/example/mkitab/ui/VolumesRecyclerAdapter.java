@@ -73,16 +73,17 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
             EventBus.getDefault().post(Keys.displayAudioController);
 
             int id = result.get(position).getId();
-            openAudioFile(file,holder, path, fileName, id);
+            String title = result.get(position).getTitle();
+            openAudioFile(file,holder, path, fileName, id,title);
 
 
         });
     }
 
-    public void openAudioFile(File file, @NonNull MViewHolder holder, String path, String fileName, int episodeId) {
+    public void openAudioFile(File file, @NonNull MViewHolder holder, String path, String fileName, int episodeId, String title) {
         Networking networking = MApplication.getNetworking();
         if (file.exists() && file.isFile()) {
-            viewModel.resume(file, episodeId + "");
+            viewModel.resume(file, episodeId + "",title);
             return;
         }
         networking.getMP3(path, new Callback<ResponseBody>() {
@@ -99,7 +100,7 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
                     if (holder != null)
                         holder.icon.setImageResource(android.R.drawable.checkbox_on_background);
 
-                    viewModel.resume(file, episodeId + "");
+                    viewModel.resume(file, episodeId + "",title);
 
                 } catch (IOException e) {
                     e.printStackTrace();
