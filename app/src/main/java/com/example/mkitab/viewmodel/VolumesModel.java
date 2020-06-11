@@ -30,12 +30,13 @@ public class VolumesModel extends ViewModel {
     private boolean haveLoaded;
     private File file;
     private int currentPositionOfMediaPlayer;
-    private String currentAudioToken = "-1";
+    private String currentAudioId = "-1";
     // toven is id
     private String episodeId;
     private boolean stopTimer;
     List<Volumes> list;
     private String title;
+    private int currentPlayingPosition;
 
     public File getFile() {
         return file;
@@ -65,44 +66,38 @@ public class VolumesModel extends ViewModel {
 
     public void previous() {
         String absolutePath = file.getAbsolutePath();
-        String substring = absolutePath.substring(absolutePath.lastIndexOf("_") + 1, absolutePath.length() - 4);
-        Integer integer = Integer.valueOf(substring);
-        integer -= 1;
-        String path = absolutePath.substring(0, absolutePath.lastIndexOf("_") + 1) + integer + ".mp3";
-        int token_ = Integer.valueOf(episodeId) + 1;
+        int tempPosition = adapter.getCurrentPlayingPosition();
+        String path = absolutePath.substring(0, absolutePath.lastIndexOf("_") + 1) + (tempPosition < 10 ? "0" + tempPosition : tempPosition) + ".mp3";
         String fileName = path.substring(path.lastIndexOf("/") + 1);
         file = new File(path);
         //change the method of getting title
-        adapter.openAudioFile(file, null, path, fileName, token_, title);
+        adapter.openAudioFile(file, null, fileName, adapter.getCurrentPlayingPosition() - 1);
     }
 
     public void next() {
 
         String absolutePath = file.getAbsolutePath();
-        String substring = absolutePath.substring(absolutePath.lastIndexOf("_") + 1, absolutePath.length() - 4);
-        Integer integer = Integer.valueOf(substring);
-        integer += 1;
-        String path = absolutePath.substring(0, absolutePath.lastIndexOf("_") + 1) + integer + ".mp3";
-        int token_ = Integer.valueOf(episodeId) - 1;
+        int tempPosition = adapter.getCurrentPlayingPosition() + 2;
+        String path = absolutePath.substring(0, absolutePath.lastIndexOf("_") + 1) + (tempPosition < 10 ? "0" + tempPosition : tempPosition) + ".mp3";
         String fileName = path.substring(path.lastIndexOf("/") + 1);
         file = new File(path);
-        adapter.openAudioFile(file, null, path, fileName, token_, title);
+        adapter.openAudioFile(file, null, fileName, adapter.getCurrentPlayingPosition() + 1);
     }
 
     public void resume() {
-        resume(file, episodeId, title);
+        resume(file, adapter.getCurrentPlayingPosition());
     }
 
     // delete episodeId field if possible
-    public void resume(File file, String episodeId, String title) {
+    public void resume(File file, int currentPlayingPosition) {
         if (file == null) return;
         this.file = file;
-        this.title = title;
-        this.episodeId = episodeId;
+        this.title = list.get(currentPlayingPosition).getTitle();
+        this.episodeId = list.get(currentPlayingPosition).getId() + "";
         try {
             if (mediaPlayer.isPlaying()) {
                 stopTimer = true;
-                if (currentAudioToken.equals(episodeId)) {
+                if (currentAudioId.equals(episodeId)) {
                     mediaPlayer.pause();
                     currentPositionOfMediaPlayer = mediaPlayer.getCurrentPosition();
                     EventBus.getDefault().post(Keys.displayPlayIcon);
@@ -113,12 +108,12 @@ public class VolumesModel extends ViewModel {
                 }
             }
             // launch different audio
-            if (!haveLoaded || !currentAudioToken.equals(episodeId)) {
+            if (!haveLoaded || !currentAudioId.equals(episodeId)) {
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(file.getPath());
                 mediaPlayer.prepare();
                 haveLoaded = true;
-                currentAudioToken = episodeId;
+                currentAudioId = episodeId;
 
                 //update duration on UI
                 Bundle bundle = new Bundle();
@@ -129,8 +124,7 @@ public class VolumesModel extends ViewModel {
                 mediaPlayer.seekTo(currentPositionOfMediaPlayer);
             }
             EventBus.getDefault().post(Keys.displayPauseIcon);
-
-
+            adapter.setCurrentPlayingPosition(currentPlayingPosition);
             mediaPlayer.start();
 
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {

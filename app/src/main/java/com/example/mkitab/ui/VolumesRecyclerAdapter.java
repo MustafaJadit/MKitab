@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,6 +43,8 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     private final VolumesModel viewModel;
     List<Volumes> result;
     private String bookId;
+    private int currentPlayingPosition;
+
 
     public VolumesRecyclerAdapter(Context context, VolumesModel viewModel) {
         this.context = context;
@@ -72,21 +75,24 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
 
             EventBus.getDefault().post(Keys.displayAudioController);
 
-            int id = result.get(position).getId();
-            String title = result.get(position).getTitle();
-            openAudioFile(file,holder, path, fileName, id,title);
+            openAudioFile(file, holder, fileName, position);
 
 
         });
     }
 
-    public void openAudioFile(File file, @NonNull MViewHolder holder, String path, String fileName, int episodeId, String title) {
+    public void openAudioFile(File file, @NonNull MViewHolder holder, String fileName, int position) {
         Networking networking = MApplication.getNetworking();
         if (file.exists() && file.isFile()) {
-            viewModel.resume(file, episodeId + "",title);
+            viewModel.resume(file,position);
             return;
         }
-        networking.getMP3(path, new Callback<ResponseBody>() {
+
+
+//        showProgressBar();
+
+
+        networking.getMP3(result.get(position).getPath(), new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
@@ -100,7 +106,7 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
                     if (holder != null)
                         holder.icon.setImageResource(android.R.drawable.checkbox_on_background);
 
-                    viewModel.resume(file, episodeId + "",title);
+                    viewModel.resume(file, position);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -113,6 +119,12 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
 
             }
         });
+    }
+
+    private void showProgressBar() {
+        ProgressBar progressBar = new ProgressBar(context);
+        progressBar.setMax(100);
+        progressBar.setProgress(20);
     }
 
 
@@ -185,5 +197,14 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
         this.result = volumes;
         this.bookId = bookId;
         notifyDataSetChanged();
+    }
+
+
+    public int getCurrentPlayingPosition() {
+        return currentPlayingPosition;
+    }
+
+    public void setCurrentPlayingPosition(int currentPlayingPosition) {
+        this.currentPlayingPosition = currentPlayingPosition;
     }
 }
