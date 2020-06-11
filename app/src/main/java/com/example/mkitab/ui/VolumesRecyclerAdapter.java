@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.Key;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -42,7 +41,7 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     private final Context context;
     private final VolumesModel viewModel;
     List<Volumes> result;
-    File file;
+    private String bookId;
 
     public VolumesRecyclerAdapter(Context context, VolumesModel viewModel) {
         this.context = context;
@@ -67,23 +66,23 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
         holder.textView.setText(result.get(position).getTitle());
         String path = result.get(position).getPath();
         String fileName = path.substring(path.lastIndexOf("/") + 1);
-        file = new File(context.getApplicationInfo().dataDir + "/" + result.get(position).getId() + "/" + fileName);
+        File file = new File(context.getApplicationInfo().dataDir + "/" + bookId + "/" + fileName);
         holder.icon.setImageResource(file.exists() ? android.R.drawable.checkbox_on_background : android.R.drawable.checkbox_off_background);
         holder.itemView.setOnClickListener((view) -> {
 
             EventBus.getDefault().post(Keys.displayAudioController);
 
             int id = result.get(position).getId();
-            openAudioFile(holder, path, fileName, id);
+            openAudioFile(file,holder, path, fileName, id);
 
 
         });
     }
 
-    public void openAudioFile(@NonNull MViewHolder holder, String path, String fileName, int id) {
+    public void openAudioFile(File file, @NonNull MViewHolder holder, String path, String fileName, int episodeId) {
         Networking networking = MApplication.getNetworking();
         if (file.exists() && file.isFile()) {
-            viewModel.resume(file, id + "");
+            viewModel.resume(file, episodeId + "");
             return;
         }
         networking.getMP3(path, new Callback<ResponseBody>() {
@@ -91,16 +90,16 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
                     byte[] bytes = response.body().bytes();
-                    file = new File(context.getApplicationInfo().dataDir + "/" + id);
+                    File file = new File(context.getApplicationInfo().dataDir + "/" + bookId);
                     file.mkdirs();
-                    File file1 = new File(file, fileName);
-                    file1.createNewFile();
-                    Files.asByteSink(file1, FileWriteMode.APPEND).write(bytes);
+                    file = new File(file, fileName);
+                    file.createNewFile();
+                    Files.asByteSink(file, FileWriteMode.APPEND).write(bytes);
                     MLog.log(TAG + " completed");
                     if (holder != null)
                         holder.icon.setImageResource(android.R.drawable.checkbox_on_background);
 
-                    viewModel.resume(file1, id + "");
+                    viewModel.resume(file, episodeId + "");
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -181,8 +180,9 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
         }
     }
 
-    public void update(List<Volumes> volumes) {
+    public void update(List<Volumes> volumes, String bookId) {
         this.result = volumes;
+        this.bookId = bookId;
         notifyDataSetChanged();
     }
 }

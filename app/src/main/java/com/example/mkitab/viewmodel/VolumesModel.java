@@ -24,34 +24,35 @@ import retrofit2.Response;
 public class VolumesModel extends ViewModel {
 
     private VolumesRecyclerAdapter adapter;
-    private String id;
+    private String bookId;
 
     MediaPlayer mediaPlayer = new MediaPlayer();
     private boolean haveLoaded;
     private File file;
     private int currentPosition;
     private String currentAudioToken = "-1";
-    private String token;
+    // toven is id
+    private String episodeId;
     private boolean stopTimer;
-    List<Volumes> body;
+    List<Volumes> list;
 
     public File getFile() {
         return file;
     }
 
-    public void setAdapter(VolumesRecyclerAdapter adapter, String id) {
+    public void setAdapter(VolumesRecyclerAdapter adapter, String bookId) {
         this.adapter = adapter;
-        this.id = id;
+        this.bookId = bookId;
     }
 
 
     public void loadData() {
         Networking instance = MApplication.getNetworking();
-        instance.getVolumes(id, new Callback<List<Volumes>>() {
+        instance.getVolumes(bookId, new Callback<List<Volumes>>() {
             @Override
             public void onResponse(Call<List<Volumes>> call, Response<List<Volumes>> response) {
-                body = response.body();
-                adapter.update(body);
+                list = response.body();
+                adapter.update(list, bookId);
             }
 
             @Override
@@ -67,10 +68,10 @@ public class VolumesModel extends ViewModel {
         Integer integer = Integer.valueOf(substring);
         integer -= 1;
         String path = absolutePath.substring(0, absolutePath.lastIndexOf("_") + 1) + integer + ".mp3";
-        int token_ = Integer.valueOf(token) + 1;
+        int token_ = Integer.valueOf(episodeId) + 1;
         String fileName = path.substring(path.lastIndexOf("/") + 1);
         file = new File(path);
-        adapter.openAudioFile(null, path, fileName, token_);
+        adapter.openAudioFile(file, null, path, fileName, token_);
     }
 
     public void next() {
@@ -80,24 +81,25 @@ public class VolumesModel extends ViewModel {
         Integer integer = Integer.valueOf(substring);
         integer += 1;
         String path = absolutePath.substring(0, absolutePath.lastIndexOf("_") + 1) + integer + ".mp3";
-        int token_ = Integer.valueOf(token) - 1;
+        int token_ = Integer.valueOf(episodeId) - 1;
         String fileName = path.substring(path.lastIndexOf("/") + 1);
         file = new File(path);
-        adapter.openAudioFile(null, path, fileName, token_);
+        adapter.openAudioFile(file, null, path, fileName, token_);
     }
 
     public void resume() {
-        resume(file, token);
+        resume(file, episodeId);
     }
 
-    public void resume(File file, String token) {
+    // delete episodeId field if possible
+    public void resume(File file, String episodeId) {
         if (file == null) return;
         this.file = file;
-        this.token = token;
+        this.episodeId = episodeId;
         try {
             if (mediaPlayer.isPlaying()) {
                 stopTimer = true;
-                if (currentAudioToken.equals(token)) {
+                if (currentAudioToken.equals(episodeId)) {
                     mediaPlayer.pause();
                     currentPosition = mediaPlayer.getCurrentPosition();
                     EventBus.getDefault().post(Keys.displayPlayIcon);
@@ -108,12 +110,12 @@ public class VolumesModel extends ViewModel {
                 }
             }
             // launch different audio
-            if (!haveLoaded || !currentAudioToken.equals(token)) {
+            if (!haveLoaded || !currentAudioToken.equals(episodeId)) {
                 mediaPlayer.reset();
                 mediaPlayer.setDataSource(file.getPath());
                 mediaPlayer.prepare();
                 haveLoaded = true;
-                currentAudioToken = token;
+                currentAudioToken = episodeId;
 
                 //update duration on UI
                 Bundle bundle = new Bundle();
