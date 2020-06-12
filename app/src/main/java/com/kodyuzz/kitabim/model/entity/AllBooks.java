@@ -1,4 +1,4 @@
-package com.example.mkitab.model.entity;
+package com.kodyuzz.kitabim.model.entity;
 
 import com.google.gson.annotations.SerializedName;
 

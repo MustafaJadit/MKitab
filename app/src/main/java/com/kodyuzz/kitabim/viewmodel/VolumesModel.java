@@ -1,16 +1,15 @@
-package com.example.mkitab.viewmodel;
+package com.kodyuzz.kitabim.viewmodel;
 
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.lifecycle.ViewModel;
 
-import com.example.mkitab.MApplication;
-import com.example.mkitab.model.Networking;
-import com.example.mkitab.model.entity.Volumes;
-import com.example.mkitab.ui.VolumesRecyclerAdapter;
-import com.example.mkitab.util.Keys;
+import com.kodyuzz.kitabim.MyApplication;
+import com.kodyuzz.kitabim.model.Networking;
+import com.kodyuzz.kitabim.model.entity.Volumes;
+import com.kodyuzz.kitabim.ui.VolumesRecyclerAdapter;
+import com.kodyuzz.kitabim.util.Keys;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -50,7 +49,7 @@ public class VolumesModel extends ViewModel {
 
 
     public void loadData() {
-        Networking instance = MApplication.getNetworking();
+        Networking instance = MyApplication.getNetworking();
         instance.getVolumes(bookId, new Callback<List<Volumes>>() {
             @Override
             public void onResponse(Call<List<Volumes>> call, Response<List<Volumes>> response) {

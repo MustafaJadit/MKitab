@@ -1,4 +1,4 @@
-package com.example.mkitab.util;
+package com.kodyuzz.kitabim.util;
 
 public class NumToTime {
     public static final String getTimeFromNum(int num) {

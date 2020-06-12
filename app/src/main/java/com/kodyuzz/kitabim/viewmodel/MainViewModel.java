@@ -1,12 +1,12 @@
-package com.example.mkitab.viewmodel;
+package com.kodyuzz.kitabim.viewmodel;
 
 import androidx.lifecycle.ViewModel;
 
-import com.example.mkitab.MApplication;
-import com.example.mkitab.model.Networking;
-import com.example.mkitab.model.entity.AllBooks;
-import com.example.mkitab.ui.AllBooksRecyclerAdapter;
-import com.example.mkitab.util.MLog;
+import com.kodyuzz.kitabim.MyApplication;
+import com.kodyuzz.kitabim.model.Networking;
+import com.kodyuzz.kitabim.model.entity.AllBooks;
+import com.kodyuzz.kitabim.ui.AllBooksRecyclerAdapter;
+import com.kodyuzz.kitabim.util.MLog;
 import com.google.gson.stream.JsonReader;
 
 import java.io.BufferedReader;
@@ -87,7 +87,7 @@ public class MainViewModel extends ViewModel {
 
 
     public void loadData() {
-        Networking instance = MApplication.getNetworking();
+        Networking instance = MyApplication.getNetworking();
         instance.getAllBooks(new Callback<AllBooks>() {
             @Override
             public void onResponse(Call<AllBooks> call, Response<AllBooks> response) {

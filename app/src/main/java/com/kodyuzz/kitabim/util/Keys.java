@@ -1,4 +1,4 @@
-package com.example.mkitab.util;
+package com.kodyuzz.kitabim.util;
 
 public interface Keys {
     String displayAudioController = "displayAudioController";

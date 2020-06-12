@@ -7,7 +7,7 @@
 
         <variable
             name="var2"
-            type="com.example.mkitab.viewmodel.VolumesModel" />
+            type="com.kodyuzz.kitabim.viewmodel.VolumesModel" />
     </data>
 
     <FrameLayout

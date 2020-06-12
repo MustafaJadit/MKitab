@@ -1,24 +1,21 @@
-package com.example.mkitab.ui;
+package com.kodyuzz.kitabim.ui;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mkitab.MApplication;
-import com.example.mkitab.model.Networking;
-import com.example.mkitab.model.entity.Volumes;
-import com.example.mkitab.util.Keys;
-import com.example.mkitab.util.MLog;
-import com.example.mkitab.util.PixelUtil;
-import com.example.mkitab.viewmodel.VolumesModel;
+import com.kodyuzz.kitabim.MyApplication;
+import com.kodyuzz.kitabim.model.Networking;
+import com.kodyuzz.kitabim.model.entity.Volumes;
+import com.kodyuzz.kitabim.util.Keys;
+import com.kodyuzz.kitabim.util.PixelUtil;
+import com.kodyuzz.kitabim.viewmodel.VolumesModel;
 import com.google.common.io.FileWriteMode;
 import com.google.common.io.Files;
 
@@ -83,7 +80,7 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     }
 
     public void openAudioFile(File file, @NonNull MViewHolder holder, String fileName, int position) {
-        Networking networking = MApplication.getNetworking();
+        Networking networking = MyApplication.getNetworking();
         if (file.exists() && file.isFile()) {
             viewModel.resume(file, position);
             return;

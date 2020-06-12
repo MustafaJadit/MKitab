@@ -1,10 +1,10 @@
-package com.example.mkitab;
+package com.kodyuzz.kitabim;
 
 import android.app.Application;
 
-import com.example.mkitab.model.Networking;
+import com.kodyuzz.kitabim.model.Networking;
 
-public class MApplication extends Application {
+public class MyApplication extends Application {
     private static final String TAG = "MApplication";
     private static Networking networking;
 

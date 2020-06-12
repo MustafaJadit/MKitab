@@ -1,4 +1,4 @@
-package com.example.mkitab.util;
+package com.kodyuzz.kitabim.util;
 
 import android.content.res.Resources;
 

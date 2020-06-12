@@ -1,4 +1,4 @@
-package com.example.mkitab.ui;
+package com.kodyuzz.kitabim.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +13,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.mkitab.model.entity.AllBooks;
+import com.kodyuzz.kitabim.model.entity.AllBooks;
 
 public class AllBooksRecyclerAdapter extends RecyclerView.Adapter<AllBooksRecyclerAdapter.AllBooksViewHolder> {
 

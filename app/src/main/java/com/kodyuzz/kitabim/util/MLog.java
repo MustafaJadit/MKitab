@@ -1,8 +1,8 @@
-package com.example.mkitab.util;
+package com.kodyuzz.kitabim.util;
 
 import android.util.Log;
 
-import com.example.mkitab.BuildConfig;
+import com.kodyuzz.kitabim.BuildConfig;
 
 public class MLog {
     private static final String TAG = "MLog";

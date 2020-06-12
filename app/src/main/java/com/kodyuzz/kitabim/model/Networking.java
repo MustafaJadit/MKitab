@@ -1,7 +1,7 @@
-package com.example.mkitab.model;
+package com.kodyuzz.kitabim.model;
 
-import com.example.mkitab.model.entity.AllBooks;
-import com.example.mkitab.model.entity.Volumes;
+import com.kodyuzz.kitabim.model.entity.AllBooks;
+import com.kodyuzz.kitabim.model.entity.Volumes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

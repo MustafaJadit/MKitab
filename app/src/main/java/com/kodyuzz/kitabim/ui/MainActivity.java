@@ -1,4 +1,4 @@
-package com.example.mkitab.ui;
+package com.kodyuzz.kitabim.ui;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -10,9 +10,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.example.mkitab.R;
-import com.example.mkitab.databinding.ActivityMainBinding;
-import com.example.mkitab.viewmodel.MainViewModel;
+import com.kodyuzz.kitabim.R;
+import com.kodyuzz.kitabim.databinding.ActivityMainBinding;
+import com.kodyuzz.kitabim.viewmodel.MainViewModel;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.example.mkitab.model.entity;
+package com.kodyuzz.kitabim.model.entity;
 
 public class Volumes {
 
