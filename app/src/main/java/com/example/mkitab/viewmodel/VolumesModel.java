@@ -127,6 +127,7 @@ public class VolumesModel extends ViewModel {
             adapter.setCurrentPlayingPosition(currentPlayingPosition);
             mediaPlayer.start();
 
+
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {

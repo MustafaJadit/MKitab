@@ -45,6 +45,7 @@ public class AllBooksRecyclerAdapter extends RecyclerView.Adapter<AllBooksRecycl
             intent.putExtra("id", result.get_$1().get(position).getId() + "");
             Bundle bundle = new Bundle();
             bundle.putString("id", result.get_$1().get(position).getId() + "");
+            bundle.putString("title", result.get_$1().get(position).getTitle());
             intent.putExtras(bundle);
             context.startActivity(intent);
         });

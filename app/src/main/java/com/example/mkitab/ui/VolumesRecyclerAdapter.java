@@ -84,13 +84,9 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     public void openAudioFile(File file, @NonNull MViewHolder holder, String fileName, int position) {
         Networking networking = MApplication.getNetworking();
         if (file.exists() && file.isFile()) {
-            viewModel.resume(file,position);
+            viewModel.resume(file, position);
             return;
         }
-
-
-//        showProgressBar();
-
 
         networking.getMP3(result.get(position).getPath(), new Callback<ResponseBody>() {
             @Override
@@ -107,6 +103,7 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
                         holder.icon.setImageResource(android.R.drawable.checkbox_on_background);
 
                     viewModel.resume(file, position);
+                    notifyItemChanged(position);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -120,13 +117,6 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
             }
         });
     }
-
-    private void showProgressBar() {
-        ProgressBar progressBar = new ProgressBar(context);
-        progressBar.setMax(100);
-        progressBar.setProgress(20);
-    }
-
 
     private void nativeDownload(String path) {
         final FileOutputStream[] fileOutputStream = {null};

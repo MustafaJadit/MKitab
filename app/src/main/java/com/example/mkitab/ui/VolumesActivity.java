@@ -16,6 +16,7 @@ import com.example.mkitab.databinding.ActivityVolumesBinding;
 import com.example.mkitab.util.Keys;
 import com.example.mkitab.util.NumToTime;
 import com.example.mkitab.viewmodel.VolumesModel;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -23,9 +24,9 @@ import org.greenrobot.eventbus.Subscribe;
 public class VolumesActivity extends AppCompatActivity {
 
 
-    Handler handler=new Handler();
-    private VolumesModel volumesModel;
-    private String id;
+    Handler handler = new Handler();
+    private VolumesModel viewModel;
+    private String id, title;
     ActivityVolumesBinding viewDataBinding;
 
 
@@ -33,12 +34,13 @@ public class VolumesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         id = getIntent().getStringExtra("id");
+        title = getIntent().getStringExtra("title");
         init();
     }
 
     private void onclickListener(ActivityVolumesBinding viewDataBinding) {
         viewDataBinding.playBtn.setOnClickListener((v) -> {
-            volumesModel.resume();
+            viewModel.resume();
 //            if (volumesModel.getFile() != null) {
 //                v.setSelected(!v.isSelected());
 //            }
@@ -47,11 +49,11 @@ public class VolumesActivity extends AppCompatActivity {
         });
 
         viewDataBinding.left.setOnClickListener((v) -> {
-            volumesModel.previous();
+            viewModel.previous();
         });
 
         viewDataBinding.right.setOnClickListener((v) -> {
-            volumesModel.next();
+            viewModel.next();
         });
 
     }
@@ -59,20 +61,19 @@ public class VolumesActivity extends AppCompatActivity {
     private void init() {
         viewDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_volumes);
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
-        volumesModel = viewModelProvider.get(VolumesModel.class);
-        VolumesRecyclerAdapter volumesRecyclerAdapter = new VolumesRecyclerAdapter(this, volumesModel);
-        volumesModel.setAdapter(volumesRecyclerAdapter, id);
+        viewModel = viewModelProvider.get(VolumesModel.class);
+        VolumesRecyclerAdapter volumesRecyclerAdapter = new VolumesRecyclerAdapter(this, viewModel);
+        viewModel.setAdapter(volumesRecyclerAdapter, id);
         viewDataBinding.volumes.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         viewDataBinding.volumes.setLayoutManager(new LinearLayoutManager(this));
         viewDataBinding.volumes.setAdapter(volumesRecyclerAdapter);
 
         onclickListener(viewDataBinding);
 
-
-        volumesModel.loadData();
+        viewModel.loadData();
         seekbarListener(viewDataBinding);
 
-
+        viewDataBinding.title.setText(title);
     }
 
     @Subscribe
@@ -81,15 +82,17 @@ public class VolumesActivity extends AppCompatActivity {
             viewDataBinding.mediaController.setVisibility(View.VISIBLE);
         } else if (Keys.displayPlayIcon.equals(message)) {
             viewDataBinding.playBtn.setSelected(false);
+            viewDataBinding.slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         } else if (Keys.displayPauseIcon.equals(message)) {
             viewDataBinding.playBtn.setSelected(true);
+            viewDataBinding.slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
         }
     }
 
     @Subscribe
     public void onMessage(Bundle bundle) {
         final int[] result = {0};
-        handler.post(()->{
+        handler.post(() -> {
             if ((result[0] = bundle.getInt(Keys.audioDuration)) != 0) {
                 viewDataBinding.seekbar.setMax(result[0]);
                 viewDataBinding.seekbar.setProgress(0);
@@ -121,9 +124,9 @@ public class VolumesActivity extends AppCompatActivity {
         viewDataBinding.seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser && volumesModel.getMediaPlayer() != null) {
+                if (fromUser && viewModel.getMediaPlayer() != null) {
                     //update the progress of audio
-                    volumesModel.updateAudioProgress(progress);
+                    viewModel.updateAudioProgress(progress);
                     viewDataBinding.audioTime.setText(NumToTime.getTimeFromNum(progress));
                 }
             }
@@ -143,6 +146,6 @@ public class VolumesActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        volumesModel.destroyMediaPlayer();
+        viewModel.destroyMediaPlayer();
     }
 }
