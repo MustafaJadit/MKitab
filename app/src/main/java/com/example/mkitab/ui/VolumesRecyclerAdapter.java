@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mkitab.MApplication;
@@ -88,6 +89,12 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
             return;
         }
 
+        EventBus.getDefault().post(Keys.loading);
+
+        loadMP3(holder, fileName, position, networking);
+    }
+
+    private void loadMP3(@NonNull MViewHolder holder, String fileName, int position, Networking networking) {
         networking.getMP3(result.get(position).getPath(), new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -98,12 +105,14 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
                     file = new File(file, fileName);
                     file.createNewFile();
                     Files.asByteSink(file, FileWriteMode.APPEND).write(bytes);
-                    MLog.log(TAG + " completed");
                     if (holder != null)
                         holder.icon.setImageResource(android.R.drawable.checkbox_on_background);
 
                     viewModel.resume(file, position);
                     notifyItemChanged(position);
+
+                    EventBus.getDefault().post(Keys.loaded);
+
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -113,6 +122,8 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                EventBus.getDefault().post(Keys.loaded);
 
             }
         });
@@ -197,4 +208,5 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     public void setCurrentPlayingPosition(int currentPlayingPosition) {
         this.currentPlayingPosition = currentPlayingPosition;
     }
+
 }

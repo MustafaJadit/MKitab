@@ -41,9 +41,6 @@ public class VolumesActivity extends AppCompatActivity {
     private void onclickListener(ActivityVolumesBinding viewDataBinding) {
         viewDataBinding.playBtn.setOnClickListener((v) -> {
             viewModel.resume();
-//            if (volumesModel.getFile() != null) {
-//                v.setSelected(!v.isSelected());
-//            }
 
 
         });
@@ -86,6 +83,10 @@ public class VolumesActivity extends AppCompatActivity {
         } else if (Keys.displayPauseIcon.equals(message)) {
             viewDataBinding.playBtn.setSelected(true);
             viewDataBinding.slidingUpPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+        } else if (Keys.loading.equals(message)) {
+            viewDataBinding.loading.setVisibility(View.VISIBLE);
+        } else if (Keys.loaded.equals(message)) {
+            viewDataBinding.loading.setVisibility(View.GONE);
         }
     }
 
