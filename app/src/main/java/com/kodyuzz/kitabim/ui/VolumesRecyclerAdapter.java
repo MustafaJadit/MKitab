@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kodyuzz.kitabim.MyApplication;
+import com.kodyuzz.kitabim.R;
 import com.kodyuzz.kitabim.model.Networking;
 import com.kodyuzz.kitabim.model.entity.Volumes;
 import com.kodyuzz.kitabim.util.Keys;
@@ -52,7 +53,7 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
     @NonNull
     @Override
     public VolumesRecyclerAdapter.MViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View inflate = LayoutInflater.from(context).inflate(android.R.layout.activity_list_item, parent, false);
+        View inflate = LayoutInflater.from(context).inflate(R.layout.detail_item, parent, false);
         VolumesRecyclerAdapter.MViewHolder viewHolder = new VolumesRecyclerAdapter.MViewHolder(inflate);
         return viewHolder;
     }
@@ -64,7 +65,7 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
 
     @Override
     public void onBindViewHolder(@NonNull VolumesRecyclerAdapter.MViewHolder holder, int position) {
-        holder.textView.setText(result.get(position).getTitle());
+        holder.textView.setText(result.get(position).getTitle().trim());
         String path = result.get(position).getPath();
         String fileName = path.substring(path.lastIndexOf("/") + 1);
         File file = new File(context.getApplicationInfo().dataDir + "/" + bookId + "/" + fileName);
@@ -109,8 +110,6 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
                     notifyItemChanged(position);
 
                     EventBus.getDefault().post(Keys.loaded);
-
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -142,11 +141,6 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
                 while ((result = inputStream[0].read(bytes)) > 0) {
                     fileOutputStream[0].write(bytes, 0, result);
                 }
-
-//                while ((line = bufferedReader.readLine()) != null) {
-//                    stringBuffer.append(line);
-//                }
-
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -184,10 +178,10 @@ public class VolumesRecyclerAdapter extends RecyclerView.Adapter<VolumesRecycler
 
         public MViewHolder(@NonNull View itemView) {
             super(itemView);
-            textView = itemView.findViewById(android.R.id.text1);
+            textView = itemView.findViewById(R.id.text1);
             int i = 10 * PixelUtil.dpToPx(1);
             textView.setPadding(i, i, i, i);
-            icon = itemView.findViewById(android.R.id.icon);
+            icon = itemView.findViewById(R.id.icon);
         }
     }
 
