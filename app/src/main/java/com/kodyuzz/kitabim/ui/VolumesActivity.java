@@ -3,7 +3,9 @@ package com.kodyuzz.kitabim.ui;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -21,7 +23,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-public class VolumesActivity extends AppCompatActivity {
+public class VolumesActivity extends AppCompatActivity implements VolumesActivityI {
 
 
     Handler handler = new Handler();
@@ -59,7 +61,7 @@ public class VolumesActivity extends AppCompatActivity {
         viewDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_volumes);
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
         viewModel = viewModelProvider.get(VolumesModel.class);
-        VolumesRecyclerAdapter volumesRecyclerAdapter = new VolumesRecyclerAdapter(this, viewModel);
+        VolumesRecyclerAdapter volumesRecyclerAdapter = new VolumesRecyclerAdapter(this, viewModel, this);
         viewModel.setAdapter(volumesRecyclerAdapter, id);
         viewDataBinding.volumes.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         viewDataBinding.volumes.setLayoutManager(new LinearLayoutManager(this));
@@ -89,6 +91,7 @@ public class VolumesActivity extends AppCompatActivity {
             viewDataBinding.loading.setVisibility(View.GONE);
         }
     }
+
 
     @Subscribe
     public void onMessage(Bundle bundle) {
@@ -148,5 +151,15 @@ public class VolumesActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         viewModel.destroyMediaPlayer();
+    }
+
+    @Override
+    public ProgressBar getProgressBar() {
+        return (ProgressBar) viewDataBinding.loading.findViewById(R.id.loading_progressbar);
+    }
+
+    @Override
+    public TextView getProgressText() {
+        return (TextView) viewDataBinding.loading.findViewById(R.id.loading_progresstext);
     }
 }
